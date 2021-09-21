@@ -1,4 +1,0 @@
-fooBar <- function(x,y=NULL){
-  if(!is.null(y)) p=y
-  return(p)
-}

@@ -37,3 +37,23 @@ main(path)
 + statmod
 + limma
 
+## 筛选条件
+
++ 默认筛选参数 PValue = 0.05
+
+```R
+main(path)
+```
+
++ 可选参数  PValue
+
+```R
+main(path,pValue)
+```
+
+```R
+main(path,p = 0.5)
+```
+
+
+
