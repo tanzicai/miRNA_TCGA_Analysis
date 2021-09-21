@@ -1,0 +1,690 @@
+#' @title miRNADiff
+
+#' @description use edgeR to analyze the different genes
+
+#' @param path
+
+#' @return NULL
+
+#' @examples main("C:\\Users\\tanzicai\\OneDrive\\文档\\cc_test\\test")
+
+#' @export main
+
+
+##' tips warming Keep the MANIFEST.txt file
+
+##' run the "main" function to start analysis
+
+#' @functionName munzip
+
+#' @author tanzicai
+
+#' @purpose move all files to a folder
+
+#' @createtime 2021.9.17
+
+#' @time 2021.9.20
+
+#' @input work path
+
+#' @return none
+
+#' @param create folder named "temp" and "source"
+#  move all files from source forlder
+#  delete the file called "annotations.txt"
+
+munzip <- function( path ){
+
+  dir.create("../temp")
+
+  dir.create("../temp/source")
+
+  filePath = dir(path = path ,full.names = T)
+
+  filePath = filePath[1:length(filePath)-1]
+
+  for(wd in filePath){
+
+    files = dir(path = wd,pattern = "txt$")
+
+    fromFilePath = paste0(wd,"/",files)
+
+    toFilePath = paste0("../temp/source/",files)
+
+    file.copy(fromFilePath,toFilePath)
+  }
+
+  unlink("../temp/source/annotations.txt")
+
+  TRUE
+}
+
+#' @functionName combin
+
+#' @author tanzicai
+
+#' @purpose read all files and merge a table
+
+#' @createtime 2021.9.17
+
+#' @time 2021.9.20
+
+#' @input temp files' source path
+
+#' @return merged the table DATA
+
+#' @param create read all the files in the source forlder
+#  merge the files and create a table
+#  return the table
+
+combin <- function(path){
+
+  countFilePath = dir(path = "../temp/source",pattern = "*.txt")
+
+  counts_merge = NULL
+
+  for (i in countFilePath) {
+
+    x=read.delim(paste0("../temp/source/",i),col.names = c("miRNA_ID",substr(i,1,9),1,2))
+
+    x=x[,1:length(x)-1]
+
+    x=x[,1:length(x)-1]
+
+    if(is.null(counts_merge)){
+
+      counts_merge = x
+
+    }else{
+
+      counts_merge =merge(counts_merge,x,by = "miRNA_ID")
+
+    }
+
+  }
+
+  write.csv(counts_merge,file = "../temp/源文件合并.csv")
+
+  rownames(counts_merge)=counts_merge$miRNA_ID
+
+  DATA = counts_merge[,-1]
+
+  TRUE
+}
+
+#' @functionName convertName
+
+#' @author tanzicai
+
+#' @purpose Comment file extraction
+
+#' @createtime 2021.9.17
+
+#' @time 2021.9.20
+
+#' @input work space path
+
+#' @return void
+
+#' @param read json file
+#  read json's file name / TCGA code and create a table
+#return the table
+
+convertName <- function(path){
+
+  if(require("rjson")){
+
+    print("成功载入包:rjson")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    install.packages("rjson")
+
+    if(require("rjson")){
+
+      print("成功安装并载入包:rjson")
+
+    } else {
+
+      stop("安装失败")
+
+    }
+  }
+
+  library(rjson)
+
+  metaJSON = fromJSON(file = paste0("../",dir(path = "../",pattern = "*.json",full.names = F)))
+
+  jsonDataInfo = data.frame(fileName = c(),TCGA_Barcode = c())
+
+  for (i in 1:length(metaJSON)) {
+
+    TCGA_barcode = metaJSON[[i]][["associated_entities"]][[1]][["entity_submitter_id"]]
+
+    fileName = metaJSON[[i]][["file_name"]]
+
+    jsonDataInfo = rbind(jsonDataInfo,data.frame(fileName = substr(fileName,1,9),TCGA_barcode = substr(TCGA_barcode,1,15)))
+
+  }
+
+  rownames(jsonDataInfo) = jsonDataInfo[,1]
+
+  write.csv(jsonDataInfo,file = "../temp/文件名与TCGA编号对照表.csv")
+
+
+  DATA = read.csv("../temp/源文件合并.csv")
+
+  DATA = DATA[-1]
+
+  fileNameToTCGA_Barcode = jsonDataInfo[-1]
+
+  jsonDataInfo = jsonDataInfo[order(jsonDataInfo$fileName),]
+
+  data = DATA
+
+  DATA = DATA[-1]
+
+  colnames(DATA) = jsonDataInfo$TCGA_barcode
+
+  DATA = cbind(data[1],DATA)
+
+  write.csv(DATA,file = "../temp/重命名_列为TCGA编号.csv")
+
+  TRUE
+}
+
+#' @functionName edgRAnalyze
+
+#' @author tanzicai
+
+#' @purpose use edgR carries on difference analysis
+
+#' @createtime 2021.9.17
+
+#' @time 2021.9.20
+
+#' @input work space path
+
+#' @return Boolean
+
+#' @param read json file
+#  read json's file name / TCGA code and create a table
+
+edgRAnalyze <- function(DATA,pValue){
+
+
+  if(require("BiocManager")){
+
+    print("成功载入包:BiocManager")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    install.packages("BiocManager")
+
+    if(require("BiocManager")){
+
+      print("成功安装并载入包")
+
+    } else {
+
+      stop("安装失败")
+
+    }
+  }
+  if(require("edgeR")){
+
+    print("成功载入包:edgeR")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    BiocManager::install("edgeR")
+
+    BiocManager::install("limma")
+  }
+
+  if(require("edgeR")){
+
+    print("成功安装并载入包")
+
+  } else {
+
+    stop("安装失败")
+
+  }
+
+
+
+  library(edgeR)
+
+  library(limma)
+
+  #将第一列换成行名
+
+  DATA = read.csv("../temp/重命名_列为TCGA编号.csv")
+
+  DATA = DATA[-1]
+
+  row.names(DATA) <- DATA[, 1]
+
+  DATA <- DATA[, -1]
+
+  #分组信息
+
+  group_list <- ifelse(as.numeric(substr(colnames(DATA),14,15))<10,"tumor","normal")
+
+  group_list <- factor(group_list,levels = c("normal","tumor"))
+
+  table(group_list)
+
+  dge <- DGEList(counts=DATA,group=group_list)
+
+
+
+  dge$samples$lib.size <- colSums(dge$counts)
+
+  dge <- calcNormFactors(dge)
+
+  design <- model.matrix(~0+group_list)
+
+  rownames(design)<-colnames(dge)
+
+  colnames(design)<-levels(group_list)
+
+  dge <- estimateGLMCommonDisp(dge,design)
+
+  dge <- estimateGLMTrendedDisp(dge, design)
+
+  dge <- estimateGLMTagwiseDisp(dge, design)
+
+  fit <- glmFit(dge, design)
+
+  fit2 <- glmLRT(fit, contrast=c(-1,1))
+
+  DEG2=topTags(fit2, n=nrow(DATA))
+
+  DEG2=as.data.frame(DEG2)
+
+  logFC_cutoff2 <- with(DEG2,mean(abs(logFC)) + 2*sd(abs(logFC)))
+
+  DEG2$change = as.factor(ifelse(DEG2$PValue < pValue & abs(DEG2$logFC) > logFC_cutoff2,ifelse(DEG2$logFC > logFC_cutoff2 ,'UP','DOWN'),'NOT'))
+
+  print("本次差异基因分析结果为")
+
+  print(table(DEG2$change))
+
+  edgeR_DEG <- DEG2
+
+  dir.create("../out_put")
+
+  write.csv(edgeR_DEG,"../out_put/差异分析结果.csv")
+
+  TRUE
+
+}
+
+
+#' @functionName edgRAnalyze2
+
+#' @author tanzicai
+
+#' @purpose use edgR carries on difference analysis(second way)
+
+#' @createtime 2021.9.17
+
+#' @time 2021.9.20
+
+#' @input work space path
+
+#' @return Boolean
+
+#' @param use edgR carries on difference analysis(second way)
+
+edgRAnalyze2 <- function(DATA,pValue){
+
+
+  if(require("BiocManager")){
+
+    print("成功载入包:BiocManager")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    install.packages("BiocManager")
+
+    if(require("BiocManager")){
+
+      print("成功安装并载入包")
+
+    } else {
+
+      stop("安装失败")
+
+    }
+  }
+  if(require("edgeR")){
+
+    print("成功载入包:edgeR")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    BiocManager::install("edgeR")
+
+    BiocManager::install("limma")
+  }
+
+  if(require("edgeR")){
+
+    print("成功安装并载入包")
+
+  } else {
+
+    stop("安装失败")
+
+  }
+
+  if(require("statmod")){
+
+    print("成功载入包:statmod")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    install.packages("statmod")
+
+  }
+
+  if(require("edgeR")){
+
+    print("成功安装并载入包:")
+
+  } else {
+
+    stop("安装失败")
+
+  }
+
+
+  library(edgeR)
+
+  library(limma)
+
+  library(statmod)
+
+  y<-DGEList(counts = DATA[,2:length(DATA)],genes = DATA[,1])
+
+  o <- order(rowSums(y$counts), decreasing=TRUE)
+
+  y <- y[o,]
+
+  d <- duplicated(y$genes$genes)
+
+  y <- y[!d,]
+
+  y$samples$lib.size <- colSums(y$counts)
+
+  #重命名基因表达矩阵的行名
+
+  rownames(y$counts)=y$genes$genes
+
+  y<-calcNormFactors(y)
+
+  plotMDS(y)
+
+  group_list <- ifelse(as.numeric(substr(colnames(DATA),14,15))<10,"tumor","normal")
+
+  Samples <- factor(group_list,levels = c("normal","tumor"))
+
+  design=model.matrix(~Samples)
+
+  rownames(design)=colnames(y)
+
+  y1=estimateDisp(y,design,robust = T)
+
+  plotBCV(y1)
+
+  fit<-glmFit(y1,design)
+
+  et1=glmLRT(fit)
+
+  print("本次差异基因分析结果为")
+
+  o <- order(et1$table$PValue)
+
+  print(summary(decideTests(et1,p.value = pValue)))
+
+  plotMD(et1)
+
+  abline(h=c(-1, 1), col="blue")
+
+  write.csv(et1,file = "../out_put/edgeR2差异分析结果.csv")
+
+  TRUE
+}
+
+
+#' @functionName edgRAnalyze3
+
+#' @author tanzicai
+
+#' @purpose use edgR carries on difference analysis(second way)
+
+#' @createtime 2021.9.17
+
+#' @time 2021.9.20
+
+#' @input work space path
+
+#' @return Boolean
+
+#' @param use edgR carries on difference analysis(third way)
+
+edgRAnalyze3 <- function(DATA,pValue){
+
+
+  if(require("BiocManager")){
+
+    print("成功载入包:BiocManager")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    install.packages("BiocManager")
+
+    if(require("BiocManager")){
+
+      print("成功安装并载入包")
+
+    } else {
+
+      stop("安装失败")
+
+    }
+  }
+  if(require("edgeR")){
+
+    print("成功载入包:edgeR")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    BiocManager::install("edgeR")
+
+    BiocManager::install("limma")
+  }
+
+  if(require("edgeR")){
+
+    print("成功安装并载入包")
+
+  } else {
+
+    stop("安装失败")
+
+  }
+
+  if(require("statmod")){
+
+    print("成功载入包:statmod")
+
+  } else {
+
+    print("不存在这个包，正在尝试安装")
+
+    install.packages("statmod")
+
+  }
+
+  if(require("edgeR")){
+
+    print("成功安装并载入包:")
+
+  } else {
+
+    stop("安装失败")
+
+  }
+
+
+  library(edgeR)
+
+  library(limma)
+
+  library(statmod)
+
+  y<-DGEList(counts = DATA[,2:length(DATA)],genes = DATA[,1])
+
+  o <- order(rowSums(y$counts), decreasing=TRUE)
+
+  y <- y[o,]
+
+  d <- duplicated(y$genes$genes)
+
+  y <- y[!d,]
+
+  y$samples$lib.size <- colSums(y$counts)
+
+  #重命名基因表达矩阵的行名
+
+  rownames(y$counts)=y$genes$genes
+
+  y<-calcNormFactors(y)
+
+  plotMDS(y)
+
+  group_list <- ifelse(as.numeric(substr(colnames(DATA),14,15))<10,"tumor","normal")
+
+  Samples <- factor(group_list,levels = c("normal","tumor"))
+
+  design=model.matrix(~Samples)
+
+  rownames(design)=colnames(y)
+
+  y1=estimateDisp(y,design,robust = T)
+
+  plotBCV(y1)
+
+  Samples = Samples[-1]
+
+  y1$samples$group=Samples
+
+  et=exactTest(y1)
+
+  write.csv(et,file = "../out_put/edgeR3差异分析结果.csv")
+
+  print("本次差异基因分析结果为")
+
+  o <- order(et$table$PValue)
+
+  print(summary(decideTests(et,p.value = pValue)))
+
+  plotMD(et)
+
+  abline(h=c(-1, 1), col="blue")
+
+  write.csv(et,file = "../out_put/edgeR2差异分析结果.csv")
+
+  TRUE
+
+}
+
+
+
+#' @functionName main
+
+#' @author tanzicai
+
+#' @purpose main function to start the analyze programe
+
+#' @createtime 2021.9.17
+
+#' @time 2021.9.20
+
+#' @input work space path
+
+#' @return void
+
+#' @param start munzip
+#' @param start combin
+#' @param start convertName
+#' @param start edgRAnalyze
+#' @param start edgRAnalyze2
+
+main <- function(path , p = NULL){
+
+  if(!is.null(p))
+  {
+
+    pValue = p
+
+  }else{
+
+    pValue = 0.05
+
+  }
+
+  setwd(path)
+
+  print("start to analyze the defferent genes in miRNA")
+
+  print("step 1 : move all files to a folder......")
+
+  if(munzip(path) == TRUE )print("successful")
+
+  print("step 2 ：read all files and merge a table.......")
+
+  if(combin(path) == TRUE )print("successful")
+
+  print("step 3 : Comment file extraction......")
+
+  if(convertName(path) == TRUE )print("successful")
+
+  DATA = read.csv("../temp/重命名_列为TCGA编号.csv")
+
+  DATA = DATA[,-1]
+
+  print("step 4 : use first way of edgR carries on difference analysis.....")
+
+  if(edgRAnalyze(DATA,pValue) == TRUE )print("successful")
+
+  print("step 5 : use second way of edgR carries on difference analysis.....")
+
+  if(edgRAnalyze2(DATA,pValue) == TRUE )print("successful")
+
+  print("step 6 : use third way of edgR carries on difference analysis.....")
+
+  if(edgRAnalyze3(DATA,pValue) == TRUE )print("successful")
+
+}
+

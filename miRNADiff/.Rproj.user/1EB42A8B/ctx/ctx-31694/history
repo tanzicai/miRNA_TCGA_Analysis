@@ -1,0 +1,60 @@
+library(miRNADiff)
+main("C:\\Users\\tanzicai\\OneDrive\\文档\\cc_test\\cc")
+library(miRNADiff)
+main("C:\\Users\\tanzicai\\OneDrive\\文档\\cc_test\\cc")
+main("C:\\Users\\tanzicai\\OneDrive\\文档\\cc_test\\cc",0.5)
+test <- function(path,...){
+z = list(...)
+if(!is.null(z$p))
+{
+pValue = p
+}else{
+pValue = 0.05
+}
+return p
+}
+test <- function(path,...){
+z = list(...)
+if(!is.null(z$p)){
+pValue = p
+}else{
+pValue = 0.05
+}
+return p
+}
+test <- function(path,...){
+z = list(...)
+if(!is.null(z$p)){
+pValue = p
+}else{
+pValue = 0.05
+}
+return p
+}
+test <- function(path,...){
+z = list(...)
+p = z$p
+return p
+}
+test <- function(path,...){
+z = list(...)
+p = z$p
+p
+}
+test(1,2)
+fooBar <- function(x,...){
+z <- list(...)
+if(!is.null(z$y)) x <- x+z$y
+return(x)
+}
+fooBar(1,2)
+fooBar <- function(x,y=NULL){
+if(!is.null(y)) x <- x+y
+return(x)
+}
+fooBar(1,2)
+fooBar <- function(x,y=NULL){
+if(!is.null(y)) p=y
+return(p)
+}
+fooBar(1,2)
