@@ -55,5 +55,14 @@ main(path,pValue)
 main(path,p = 0.5)
 ```
 
+## 安装方法
+
+```R
+install.packages("devtools")
+library(devtools)
+install_github("tanzicai/miRNA_TCGA_Analysis/miRNADiff")
+library(miRNADiff)
+```
+
 
 
