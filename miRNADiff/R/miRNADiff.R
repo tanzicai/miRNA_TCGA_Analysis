@@ -688,3 +688,364 @@ main <- function(path , p = NULL){
 
 }
 
+
+main2 <-function(){
+  rm(list = ls())
+  print("正在安装所需要的包")
+
+  print("正在加载：stringr")
+  if(!require(stringr))
+    BiocManager::install('stringr')
+
+  print("正在加载：patchwork")
+  if(!require(patchwork))
+    BiocManager::install('patchwork')
+  print("正在加载：cowplot")
+
+  if(!require(cowplot))
+    BiocManager::install('cowplot')
+  print("正在加载：DESeq2")
+
+  if(!require(DESeq2))
+    BiocManager::install('DESeq2')
+  print("正在加载：edgeR")
+
+  if(!require(edgeR))
+    BiocManager::install('edgeR')
+  print("正在加载：limma")
+
+  if(!require(limma))
+    BiocManager::install('limma')
+
+  devtools::install_github('kevinblighe/EnhancedVolcano')
+
+
+  if(!require(TCGAbiolinks))
+    BiocManager::install('TCGAbiolinks')
+  library(TCGAbiolinks)
+
+  devtools::install_github('kevinblighe/EnhancedVolcano')
+  library(EnhancedVolcano)
+
+
+  print("支持的癌症种类的缩写如下，请选择下载的癌症类型")
+  print(TCGAbiolinks:::getGDCprojects()$project_id)
+  TCGA-KICHcancer_type = readline()
+
+  clinical <- GDCquery_clinic(project = cancer_type, type = "clinical")
+
+  query <- GDCquery(project = cancer_type,
+
+                    data.category = "Transcriptome Profiling",
+
+                    data.type = "miRNA Expression Quantification",
+
+                    workflow.type = "BCGSC miRNA Profiling",
+
+                    data.format = "txt")
+
+  print("正在下载数据")
+
+  GDCdownload(query, method = "api", files.per.chunk = 50)
+
+  print("正在合并数据")
+
+  expdat <- GDCprepare(query = query)
+
+
+  library(tibble)
+
+  #重命名行名
+
+  rownames(expdat) <- NULL
+
+  expdat <- column_to_rownames(expdat,var = "miRNA_ID")
+
+  expdat[1:3,1:3]
+
+  #行列置换
+
+  exp = t(expdat[,seq(1,ncol(expdat),3)])
+
+  exp[1:4,1:4]
+
+  expr=exp
+
+  #行名分割替换
+
+  rowName <- str_split(rownames(exp),'_',simplify = T)[,3]
+
+  expr<- apply(expr,2,as.numeric)
+
+  expr<- na.omit(expr)
+
+  dim(expr)
+
+  expr <- expr[,apply(expr, 2,function(x){sum(x>1)>10})]
+
+  rownames(expr) <- rowName
+
+  dim(expr)
+
+  expr[1:4,1:4]
+
+  #保存数据
+
+  save(expr,clinical,file = paste0("tcga-",cancer_type,"-download.Rdata"))
+
+  meta <- clinical
+
+  colnames(meta)
+
+  meta <- meta[,c("submitter_id","vital_status",
+
+                  "days_to_death","days_to_last_follow_up",
+
+                  "race",
+
+                  "age_at_diagnosis",
+
+                  "gender" ,
+
+                  "ajcc_pathologic_stage")]
+
+  #转置样本
+  expr=t(expr)
+
+  expr[1:4,1:4]
+
+  #分出tumor组和normal组
+
+  group_list <- ifelse(as.numeric(str_sub(colnames(expr),14,15))<10,"tumor","normal")
+
+  group_list <- factor(group_list,levels = c("normal","tumor"))
+
+
+  print("分组信息如下：")
+
+  table(group_list)
+
+  save(expr,group_list,file = paste0("tcga-",cancer_type,"-raw.Rdata"))
+
+  # 使用DESeq2
+
+  library(DESeq2)
+
+  colData <- data.frame(row.names =colnames(expr), condition=group_list)
+
+
+  write.csv(colData,"./分组信息.csv")
+
+  dds <- DESeqDataSetFromMatrix(
+    countData = expr,
+
+    colData = colData,
+
+    design = ~ condition)
+
+  dds <- DESeq(dds)
+
+  # 两两比较/
+
+  res <- results(dds, contrast = c("condition",rev(levels(group_list))))
+
+  resOrdered <- res[order(res$pvalue),] # 按照P值排序
+
+  DEG <- as.data.frame(resOrdered)
+
+  head(DEG)
+
+  DEG <- na.omit(DEG)
+
+  #logFC_cutoff <- with(DEG,mean(abs(log2FoldChange)) + 2*sd(abs(log2FoldChange)) )
+  logFC_cutoff <- 1
+
+  DEG$change = as.factor(ifelse(DEG$pvalue < 0.05 & abs(DEG$log2FoldChange) > logFC_cutoff,ifelse(DEG$log2FoldChange > logFC_cutoff ,'UP','DOWN'),'NOT'))
+
+  head(DEG)
+
+  DESeq2_DEG <- DEG
+
+  print("使用DESeq2分析结果如下")
+
+  table(DESeq2_DEG$change)
+
+  write.csv(DESeq2_DEG,"./DESeq2_DEG分析结果.csv")
+
+  # 使用edgeR方法
+
+  library(edgeR)
+
+  dge <- DGEList(counts=expr,group=group_list)
+
+  dge$samples$lib.size <- colSums(dge$counts)
+
+  dge <- calcNormFactors(dge)
+
+  design <- model.matrix(~0+group_list)
+
+  rownames(design)<-colnames(dge)
+
+  colnames(design)<-levels(group_list)
+
+  dge <- estimateGLMCommonDisp(dge,design)
+
+  dge <- estimateGLMTrendedDisp(dge, design)
+
+  dge <- estimateGLMTagwiseDisp(dge, design)
+
+  fit <- glmFit(dge, design)
+
+  fit2 <- glmLRT(fit, contrast=c(-1,1))
+
+  DEG=topTags(fit2, n=nrow(expr))
+
+  DEG=as.data.frame(DEG)
+
+  logFC_cutoff <- with(DEG,mean(abs(logFC)) + 2*sd(abs(logFC)) )
+
+  logFC_cutoff <- 1
+
+  DEG$change = as.factor(
+
+    ifelse(DEG$PValue < 0.05 & abs(DEG$logFC) > logFC_cutoff,
+
+           ifelse(DEG$logFC > logFC_cutoff ,'UP','DOWN'),'NOT')
+
+  )
+
+  head(DEG)
+
+  print("使用edgeR分析结果：")
+  table(DEG$change)
+
+  edgeR_DEG <- DEG
+
+  write.csv(edgeR_DEG,"./edgeR_DEG分析结果.csv")
+
+  #limma
+
+  library(limma)
+
+
+  design <- model.matrix(~0+group_list)
+
+  colnames(design)=levels(group_list)
+
+  rownames(design)=colnames(expr)
+
+
+  dge <- DGEList(counts=expr)
+
+  dge <- calcNormFactors(dge)
+
+  logCPM <- cpm(dge, log=TRUE, prior.count=3)
+
+
+  v <- voom(dge,design, normalize="quantile")
+
+  fit <- lmFit(v, design)
+
+
+  constrasts = paste(rev(levels(group_list)),collapse = "-")
+
+  cont.matrix <- makeContrasts(contrasts=constrasts,levels = design)
+
+  fit2=contrasts.fit(fit,cont.matrix)
+
+  fit2=eBayes(fit2)
+
+  DEG = topTable(fit2, coef=constrasts, n=Inf)
+
+  DEG = na.omit(DEG)
+  #logFC_cutoff <- with(DEG,mean(abs(logFC)) + 2*sd(abs(logFC)) )
+
+  logFC_cutoff <- 1
+
+  DEG$change = as.factor(
+
+    ifelse(DEG$P.Value < 0.05 & abs(DEG$logFC) > logFC_cutoff,
+
+           ifelse(DEG$logFC > logFC_cutoff ,'UP','DOWN'),'NOT')
+  )
+
+
+  head(DEG)
+
+  limma_voom_DEG <- DEG
+
+  write.csv(limma_voom_DEG,"./limma_voom_DEG分析结果.csv")
+
+  print("使用limma分析：")
+
+  table(limma_voom_DEG$change)
+
+  save(DESeq2_DEG,edgeR_DEG,limma_voom_DEG,group_list,file = "DEG.Rdata")
+
+  cg1 = rownames(DESeq2_DEG)[DESeq2_DEG$change !="NOT"]
+
+  cg2 = rownames(edgeR_DEG)[edgeR_DEG$change !="NOT"]
+
+  cg3 = rownames(limma_voom_DEG)[limma_voom_DEG$change !="NOT"]
+
+  logFC_cutoff <- 1
+
+
+  dat = log(expr+1)
+
+  p1 = draw_pca(dat,group_list,"pc.png")
+
+  h1 = draw_heatmap(expr[cg1,],group_list,"heatmap_DESeq2.png")
+
+  h2 = draw_heatmap(expr[cg2,],group_list,"heatmap_edgeR.png")
+
+  h3 = draw_heatmap(expr[cg3,],group_list,"heatmap_limma.png")
+
+ # v1 = EnhancedVolcano(DESeq2_DEG[,c(2,5,7)],
+ #                      lab = rownames(DESeq2_DEG[,c(2,5,7)]),
+ #                      x = 'log2FoldChange',
+  #                     y = 'padj',
+  #                     xlim = c(-6,7),
+  #                     xlab = bquote(~Log[2]~ 'fold change'),
+  #                     pCutoff = 10e-14,
+   #                    FCcutoff = 2
+  #)
+
+ # v2 =  EnhancedVolcano(edgeR_DEG[,c(1,4)],
+  #                      lab = rownames(edgeR_DEG[,c(1,4)]),
+   #                     x = 'logFC',
+  #                      y = 'PValue  ',
+  #                      xlim = c(-6,7),
+  #                      xlab = bquote(~Log[2]~ 'fold change'),
+  #                      pCutoff = 10e-14,
+  #                      FCcutoff = 2
+ # )
+
+ # v3 = EnhancedVolcano(limma_voom_DEG[,c(1,4,7)],
+  #                     lab = rownames(limma_voom_DEG[,c(1,4,7)]),
+  #                     x = 'logFC',
+  #                     y = 'P.Value  ',
+   #                    xlim = c(-6,7),
+  #                     xlab = bquote(~Log[2]~ 'fold change'),
+  #                     pCutoff = 10e-14,
+  #                     FCcutoff = 2
+  #)
+
+
+ # BiocManager::install("ggplot")
+ # library(ggplot)
+
+#  van = ggplot(DESeq2_DEG[,c(2,5,7)],aes(log2FoldChange,padj))
+ # van + geom_point(aes())+
+ #   ylim(0,20) + xlim(-5,5) +
+ #   scale_color_manual(values=c("blue","grey", "red"))+
+ #   geom_vline(xintercept = c(-1, 1), lty = 2,colour="#000000")+ #增加虚线
+ #   geom_hline(yintercept = c(1), lty = 2,colour="#000000")+
+  #  theme(
+  #    axis.text=element_text(size=20),
+  #    axis.title=element_text(size=20)
+  #  )
+ #
+}
+
+
