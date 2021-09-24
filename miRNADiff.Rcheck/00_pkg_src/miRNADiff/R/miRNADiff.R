@@ -729,10 +729,8 @@ main2 <-function(){
 
 
   print("支持的癌症种类的缩写如下，请选择下载的癌症类型")
-
   print(TCGAbiolinks:::getGDCprojects()$project_id)
-
-  cancer_type = readline()
+  TCGA-KICHcancer_type = readline()
 
   clinical <- GDCquery_clinic(project = cancer_type, type = "clinical")
 
