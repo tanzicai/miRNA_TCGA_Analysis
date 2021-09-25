@@ -280,7 +280,7 @@ edgRAnalyze <- function(DATA,pValue){
 
   group_list <- factor(group_list,levels = c("normal","tumor"))
 
-  table(group_list)
+  print(table(group_list))
 
   dge <- DGEList(counts=DATA,group=group_list)
 
@@ -688,6 +688,60 @@ main <- function(path , p = NULL){
 
 }
 
+draw_pca<-function(dat,group_list,path){
+## 下面是画PCA的必须操作，需要看说明书。
+dat=t(dat)#画PCA图时要求是行名时样本名，列名时探针名，因此此时需要转换
+dat=as.data.frame(dat)#将matrix转换为data.frame
+dat=cbind(dat,group_list) #cbind横向追加，即将分组信息追加到最后一列
+library("FactoMineR")#画主成分分析图需要加载这两个包
+library("factoextra")
+# The variable group_list (index = 54676) is removed
+# before PCA analysis
+dat.pca <- PCA(dat[,-ncol(dat)], graph = FALSE)#现在dat最后一列是group_list，需要重新赋值给一个dat.pca,这个矩阵是不含有分组信息的
+
+fviz_pca_ind(dat.pca,
+
+             geom.ind = "point", # show points only (nbut not "text")
+
+             col.ind = dat$group_list, # color by groups
+
+             #palette = c("#00AFBB", "#E7B800"),
+
+             addEllipses = TRUE, # Concentration ellipses
+
+             legend.title = "Groups"
+)
+
+ggsave(path)
+}
+
+
+draw_heatmap<-function(dat,group_list,path){
+
+cg=names(tail(sort(apply(dat,1,sd)),1000))#apply按行（'1'是按行取，'2'是按列取）取每一行的方差，从小到大排序，取最大的1000个
+
+library(pheatmap)
+
+pheatmap(dat[cg,],show_colnames =F,show_rownames = F) #对那些提取出来的1000个基因所在的每一行取出，组合起来为一个新的表达矩阵
+
+n=t(scale(t(dat[cg,]))) # 'scale'可以对log-ratio数值进行归一化
+
+n[n>2]=2
+
+n[n< -2]= -2
+
+n[1:4,1:4]
+
+pheatmap(n,show_colnames =F,show_rownames = F)
+
+ac=data.frame(g=group_list)
+
+rownames(ac)=colnames(n) #把ac的行名给到n的列名，即对每一个探针标记上分组信息
+
+pheatmap(n,show_colnames =F,show_rownames = F,
+         annotation_col=ac,filename = path)
+}
+
 
 main2 <-function(){
   rm(list = ls())
@@ -870,7 +924,7 @@ main2 <-function(){
 
   print("使用DESeq2分析结果如下")
 
-  table(DESeq2_DEG$change)
+  print(table(DESeq2_DEG$change))
 
   write.csv(DESeq2_DEG,"./DESeq2_DEG分析结果.csv")
 
@@ -919,7 +973,7 @@ main2 <-function(){
   head(DEG)
 
   print("使用edgeR分析结果：")
-  table(DEG$change)
+  print(table(DEG$change))
 
   edgeR_DEG <- DEG
 
@@ -980,7 +1034,7 @@ main2 <-function(){
 
   print("使用limma分析：")
 
-  table(limma_voom_DEG$change)
+  print(table(limma_voom_DEG$change))
 
   save(DESeq2_DEG,edgeR_DEG,limma_voom_DEG,group_list,file = "DEG.Rdata")
 
@@ -995,13 +1049,25 @@ main2 <-function(){
 
   dat = log(expr+1)
 
-  p1 = draw_pca(dat,group_list,"pc.png")
+  p1 = draw_pca(dat,group_list,"./pca.png")
 
-  h1 = draw_heatmap(expr[cg1,],group_list,"heatmap_DESeq2.png")
+  h1 = draw_heatmap(expr[cg1,],group_list,"./heatmap_DESeq2.png")
 
-  h2 = draw_heatmap(expr[cg2,],group_list,"heatmap_edgeR.png")
+  h2 = draw_heatmap(expr[cg2,],group_list,"./heatmap_edgeR.png")
 
-  h3 = draw_heatmap(expr[cg3,],group_list,"heatmap_limma.png")
+  h3 = draw_heatmap(expr[cg3,],group_list,"./heatmap_limma.png")
+
+  data = DESeq2_DEG[,c(2,5,7)]
+
+  write.csv(data,"./DESeq2_DEG_volcano.csv")
+
+  data = edgeR_DEG[,c(1,4,6)]
+
+  write.csv(data,"./edgeR_DEG_volcano.csv")
+
+  data = limma_voom_DEG[,c(1,4,7)]
+
+  write.csv(data,"./limma_DEG_volcano.csv")
 
  # v1 = EnhancedVolcano(DESeq2_DEG[,c(2,5,7)],
  #                      lab = rownames(DESeq2_DEG[,c(2,5,7)]),

@@ -1,7 +1,7 @@
 Package: miRNADiff
 Type: Package
 Title: use edgeR to analyze the different genes
-Version: 0.1.0
+Version: 0.2.0
 Author: tanzicai
 Maintainer: tanzicai <1728561744@qq.com>
 Description: use edgeR to analyze the different genes
