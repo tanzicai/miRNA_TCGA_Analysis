@@ -1,10 +1,29 @@
-## 描述
+# 描述
 
-本包主要目的是对'TCGA'上面的'miRNA'基因进行差异基因分析的，主要使用了'edgeR'包进行分析，并对差异基因生成火山图。
+本包主要目的对`TCGA`上面的`miRNA`基因进行差异基因分析。主要使用手段有：
 
-## 使用方法
+1. 使用`edgeR`包推荐方法进行分析
+2. 使用`edgeR`包推荐classic analysis method进行分析
+3. 使用`DESeq2`包推荐方法进行分析
+4. 使用`limma`包推荐方法进行分析
+5. 使用ggplot绘制火山图
+6. 使用ggplot绘制热图
+7. 使用ggplot绘制PCA图（主成分分析图）
+8. 使用edgeR绘制BCV图（生物学差异图）
+
+# 使用方法
+
+主要函数说明
+
+## main函数
+
+主要使用`edgeR`包进行经典基因差异分析。
 
 ### 参数说明
+
+```R
+main(path)
+```
 
 + path 为解压后的数据的总文件
 
@@ -20,22 +39,13 @@ C:\\Users\\tanzicai\\Downloads
 
 + 注意保留解压后的'MANIFEST.txt'
 
+## main2函数
 
-### 开始分析
 
-+ 调用主函数'main'开始基因分析
-
+主要使用`edgeR`、`DESeq2`、`limma`进行包进行经典基因差异分析。
 ```R
-main(path)
+main()
 ```
-
-## 主要使用的R包
-
-+ rjson
-+ BiocManager
-+ edgeR
-+ statmod
-+ limma
 
 ## 筛选条件
 
