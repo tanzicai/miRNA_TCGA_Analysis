@@ -1,0 +1,337 @@
+* using log directory 'F:/Bio/test/miRNADiff.Rcheck'
+* using R version 4.1.1 (2021-08-10)
+* using platform: x86_64-w64-mingw32 (64-bit)
+* using session charset: CP936
+* using options '--no-manual --as-cran'
+* checking for file 'miRNADiff/DESCRIPTION' ... OK
+* checking extension type ... Package
+* this is package 'miRNADiff' version '0.2.0'
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking serialization versions ... OK
+* checking whether package 'miRNADiff' can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Malformed Description field: should contain one or more complete sentences.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... WARNING
+Found the following file with non-ASCII characters:
+  hello.R
+Portable packages must use only ASCII characters in their R code,
+except perhaps in comments.
+Use \uxxxx escapes for other characters.
+* checking R files for syntax errors ... ERROR
+Error in file 'R/hello.R':
+  /Bio/test/miRNADiff.Rcheck/00_pkg_src/miRNADiff/R/hello.R:1689:3: unexpected input
+  1688: 
+  1689:   鏀笺复
+          ^
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking dependencies in R code ... NOTE
+'::'或':::'引进没有被声明:
+  'BiocManager' 'TCGAbiolinks'
+'library'或'require'调用没有被声明:
+  'BiocManager' 'DESeq2' 'FactoMineR' 'TCGAbiolinks' 'cowplot' 'edgeR'
+  'factoextra' 'limma' 'patchwork' 'pheatmap' 'rjson' 'statmod'
+  'stringr' 'tibble'
+'library' or 'require' calls in package code:
+  'BiocManager' 'DESeq2' 'FactoMineR' 'TCGAbiolinks' 'cowplot' 'edgeR'
+  'factoextra' 'limma' 'patchwork' 'pheatmap' 'rjson' 'statmod'
+  'stringr' 'tibble'
+  Please use :: or requireNamespace() instead.
+  See section 'Suggested packages' in the 'Writing R Extensions' manual.
+':::' call which should be '::': 'TCGAbiolinks:::getGDCprojects'
+  See the note in ?`:::` about the use of this operator.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+aotoAllCancerAnalysis: no visible global function definition for
+  'runnByDEseq2AndEdgeR'
+aotoAllCancerAnalysisTest: no visible global function definition for
+  'runByDEseq2AndEdgeR'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'GDCquery_clinic'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'GDCquery'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'GDCdownload'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'GDCprepare'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'column_to_rownames'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'str_split'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'na.omit'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'str_sub'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'write.csv'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'DESeqDataSetFromMatrix'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'DESeq'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'results'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'head'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'DGEList'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'calcNormFactors'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'model.matrix'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'estimateGLMCommonDisp'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'estimateGLMTrendedDisp'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'estimateGLMTagwiseDisp'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'glmFit'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'glmLRT'
+autoAnalyssisByDESeq2AndedgeR: no visible global function definition
+  for 'topTags'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'GDCquery_clinic'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'GDCquery'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'GDCdownload'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'GDCprepare'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'column_to_rownames'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'str_split'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'na.omit'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'str_sub'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'write.csv'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'DESeqDataSetFromMatrix'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'DESeq'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'results'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'head'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'DGEList'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'calcNormFactors'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'model.matrix'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'estimateGLMCommonDisp'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'estimateGLMTrendedDisp'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'estimateGLMTagwiseDisp'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'glmFit'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'glmLRT'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'topTags'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'cpm'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'voom'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'lmFit'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'makeContrasts'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'contrasts.fit'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'eBayes'
+autoAnalyssisSingleCancer: no visible global function definition for
+  'topTable'
+combin: no visible global function definition for 'read.delim'
+combin: no visible global function definition for 'write.csv'
+convertName: no visible global function definition for
+  'install.packages'
+convertName: no visible global function definition for 'fromJSON'
+convertName: no visible global function definition for 'write.csv'
+convertName: no visible global function definition for 'read.csv'
+convertName2: no visible global function definition for
+  'gdcParseMetadata'
+convertName2: no visible global function definition for 'write.csv'
+convertName2: no visible binding for global variable 'expr'
+convertName2: no visible binding for global variable 'group_list'
+convertName2: no visible binding for global variable 'DESeq2_DEG'
+convertName2: no visible binding for global variable 'DEG'
+draw_heatmap: no visible global function definition for 'tail'
+draw_heatmap: no visible binding for global variable 'sd'
+draw_heatmap: no visible global function definition for 'pheatmap'
+draw_pca: no visible global function definition for 'PCA'
+draw_pca: no visible global function definition for 'fviz_pca_ind'
+draw_pca: no visible global function definition for 'ggsave'
+edgRAnalyze: no visible global function definition for
+  'install.packages'
+edgRAnalyze: no visible global function definition for 'read.csv'
+edgRAnalyze: no visible global function definition for 'DGEList'
+edgRAnalyze: no visible global function definition for
+  'calcNormFactors'
+edgRAnalyze: no visible global function definition for 'model.matrix'
+edgRAnalyze: no visible global function definition for
+  'estimateGLMCommonDisp'
+edgRAnalyze: no visible global function definition for
+  'estimateGLMTrendedDisp'
+edgRAnalyze: no visible global function definition for
+  'estimateGLMTagwiseDisp'
+edgRAnalyze: no visible global function definition for 'glmFit'
+edgRAnalyze: no visible global function definition for 'glmLRT'
+edgRAnalyze: no visible global function definition for 'topTags'
+edgRAnalyze: no visible global function definition for 'write.csv'
+edgRAnalyze2: no visible global function definition for
+  'install.packages'
+edgRAnalyze2: no visible global function definition for 'DGEList'
+edgRAnalyze2: no visible global function definition for
+  'calcNormFactors'
+edgRAnalyze2: no visible global function definition for 'plotMDS'
+edgRAnalyze2: no visible global function definition for 'model.matrix'
+edgRAnalyze2: no visible global function definition for 'estimateDisp'
+edgRAnalyze2: no visible global function definition for 'plotBCV'
+edgRAnalyze2: no visible global function definition for 'glmFit'
+edgRAnalyze2: no visible global function definition for 'glmLRT'
+edgRAnalyze2: no visible global function definition for 'decideTests'
+edgRAnalyze2: no visible global function definition for 'plotMD'
+edgRAnalyze2: no visible global function definition for 'abline'
+edgRAnalyze2: no visible global function definition for 'write.csv'
+edgRAnalyze3: no visible global function definition for
+  'install.packages'
+edgRAnalyze3: no visible global function definition for 'DGEList'
+edgRAnalyze3: no visible global function definition for
+  'calcNormFactors'
+edgRAnalyze3: no visible global function definition for 'plotMDS'
+edgRAnalyze3: no visible global function definition for 'model.matrix'
+edgRAnalyze3: no visible global function definition for 'estimateDisp'
+edgRAnalyze3: no visible global function definition for 'plotBCV'
+edgRAnalyze3: no visible global function definition for 'exactTest'
+edgRAnalyze3: no visible global function definition for 'write.csv'
+edgRAnalyze3: no visible global function definition for 'decideTests'
+edgRAnalyze3: no visible global function definition for 'plotMD'
+edgRAnalyze3: no visible global function definition for 'abline'
+main: no visible global function definition for 'read.csv'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'GDCquery_clinic'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'GDCquery'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'GDCdownload'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'GDCprepare'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'column_to_rownames'
+runByDEseq2AndEdgeRmain: no visible binding for global variable 'DATA'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'str_split'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'na.omit'
+runByDEseq2AndEdgeRmain: no visible binding for global variable
+  '保存数据'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'str_sub'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'write.csv'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'DESeqDataSetFromMatrix'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'DESeq'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'results'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'head'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'DGEList'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'calcNormFactors'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'model.matrix'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'estimateGLMCommonDisp'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'estimateGLMTrendedDisp'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'estimateGLMTagwiseDisp'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'glmFit'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'glmLRT'
+runByDEseq2AndEdgeRmain: no visible global function definition for
+  'topTags'
+Undefined global functions or variables:
+  DATA DEG DESeq DESeq2_DEG DESeqDataSetFromMatrix DGEList GDCdownload
+  GDCprepare GDCquery GDCquery_clinic PCA abline calcNormFactors
+  column_to_rownames contrasts.fit cpm decideTests eBayes estimateDisp
+  estimateGLMCommonDisp estimateGLMTagwiseDisp estimateGLMTrendedDisp
+  exactTest expr fromJSON fviz_pca_ind gdcParseMetadata ggsave glmFit
+  glmLRT group_list head install.packages lmFit makeContrasts
+  model.matrix na.omit pheatmap plotBCV plotMD plotMDS read.csv
+  read.delim results runByDEseq2AndEdgeR runnByDEseq2AndEdgeR sd
+  str_split str_sub tail topTable topTags voom write.csv 保存数据
+Consider adding
+  importFrom("graphics", "abline")
+  importFrom("stats", "model.matrix", "na.omit", "sd")
+  importFrom("utils", "head", "install.packages", "read.csv",
+             "read.delim", "tail", "write.csv")
+to your NAMESPACE file.
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... WARNING
+未公开的编码对象:
+  'aotoAllCancerAnalysis' 'aotoAllCancerAnalysisTest'
+  'autoAnalyssisByDESeq2AndedgeR' 'autoAnalyssisSingleCancer'
+  'draw_heatmap' 'draw_pca' 'envirment' 'main'
+  'runByDEseq2AndEdgeRmain'
+All user-level objects in a package should have documentation entries.
+See chapter 'Writing R documentation files' in the 'Writing R
+Extensions' manual.
+* checking for code/documentation mismatches ... WARNING
+Functions or methods with usage in documentation object 'hello' but not in code:
+  'hello'
+
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking examples ... ERROR
+Running examples in 'miRNADiff-Ex.R' failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: hello
+> ### Title: Hello, World!
+> ### Aliases: hello
+> 
+> ### ** Examples
+> 
+> hello()
+Error in hello() : could not find function "hello"
+Execution halted
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+Status: 2 ERRORs, 3 WARNINGs, 3 NOTEs
