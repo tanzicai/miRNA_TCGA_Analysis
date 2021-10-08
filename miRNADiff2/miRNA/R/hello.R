@@ -1377,18 +1377,6 @@ autoAnalyssisByDESeq2AndedgeR<-function(input_type){
 
   colnames(meta)
 
-  meta <- meta[,c("submitter_id","vital_status",
-
-                  "days_to_death","days_to_last_follow_up",
-
-                  "race",
-
-                  "age_at_diagnosis",
-
-                  "gender" ,
-
-                  "ajcc_pathologic_stage")]
-
 
   print("转置样本")
 
@@ -1696,18 +1684,6 @@ runByDEseq2AndEdgeRmain <- function(input_type){
 
   colnames(meta)
 
-  meta <- meta[,c("submitter_id","vital_status",
-
-                  "days_to_death","days_to_last_follow_up",
-
-                  "race",
-
-                  "age_at_diagnosis",
-
-                  "gender" ,
-
-                  "ajcc_pathologic_stage")]
-
   #转置样本
   expr=t(expr)
 
@@ -1953,12 +1929,13 @@ aotoAllCancerAnalysis <- function(){
     dir.create(input_type)
 
     setwd(paste0("./",input_type))
-
-    imfo = runnByDEseq2AndEdgeR(input_type)
+    try({
+      imfo = autoAnalyssisSingleCancer(input_type)
 
     setwd("../")
 
     cancer_infomation = cbind(cancer_infomation,imfo)
+    })
 
     save(cancer_infomation,needAnalyze,"./cancer_infomation.Rdata")
 
@@ -1997,8 +1974,6 @@ aotoAllCancerAnalysis <- function(){
 
 aotoAllCancerAnalysisList <- function(list){
 
-  # setwd("/home/TCGA_Analysis")
-
   cancer_infomation = data.frame(row.names = c("项目名称","样本总数","样本非0基因总数","normal","tumor","DESeq2_DOWN","DESeq2_NOT","DESeq2_UP","edgeR_DOWN","edgeR_NOT","edgeR_UP"))
 
   for(i in 1:length(list)){
@@ -2009,15 +1984,17 @@ aotoAllCancerAnalysisList <- function(list){
 
     setwd(paste0("./",input_type))
 
+    if(i == 2)load("./cancer_infomation.Rdata")
+
     try({
-      imfo = runByDEseq2AndEdgeR(input_type)
-    })
+
+      imfo = autoAnalyssisSingleCancer(input_type)
 
     setwd("../")
 
-    if(i == 2)load("./cancer_infomation.Rdata")
-
     cancer_infomation = cbind(cancer_infomation,imfo)
+
+    })
 
     save(cancer_infomation,file = "./cancer_infomation.Rdata")
 
@@ -2026,5 +2003,4 @@ aotoAllCancerAnalysisList <- function(list){
   }
 
 }
-## TCGA-HNSC
-## TCGA-KICH
+
