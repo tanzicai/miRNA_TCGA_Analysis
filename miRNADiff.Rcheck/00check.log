@@ -8,15 +8,4 @@
 * this is package 'miRNADiff' version '0.2.0'
 * package encoding: UTF-8
 * checking package namespace information ... OK
-* checking package dependencies ... OK
-* checking if this is a source package ... OK
-* checking if there is a namespace ... OK
-* checking for executable files ... OK
-* checking for hidden files and directories ... OK
-* checking for portable file names ... OK
-* checking serialization versions ... OK
-* checking whether package 'miRNADiff' can be installed ... ERROR
-Installation failed.
-See 'F:/Bio/miRNADiff.Rcheck/00install.out' for details.
-* DONE
-Status: 1 ERROR
+* checking package dependencies ...

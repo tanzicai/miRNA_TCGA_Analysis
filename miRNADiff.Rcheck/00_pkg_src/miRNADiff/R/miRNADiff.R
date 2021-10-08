@@ -1922,8 +1922,6 @@ combin_TCGA <-function(cancer_type){
 
 aotoAllCancerAnalysis <- function(){
 
-  setwd("/home/TCGA_Analysis")
-
   cancer_list = TCGAbiolinks:::getGDCprojects()$project_id
 
   table = gregexpr("TCGA",cancer_list)
@@ -1944,7 +1942,7 @@ aotoAllCancerAnalysis <- function(){
 
   cancer_infomation = data.frame(row.names = c("项目名称","样本总数","样本非0基因总数","normal","tumor","DESeq2_DOWN","DESeq2_NOT","DESeq2_UP","edgeR_DOWN","edgeR_NOT","edgeR_UP"))
 
-  for(i in 3:length(needAnalyze)){
+  for(i in 1:length(needAnalyze)){
 
     load("./cancer_infomation.Rdata")
 
@@ -1954,7 +1952,9 @@ aotoAllCancerAnalysis <- function(){
 
     setwd(paste0("./",input_type))
 
-    imfo = runnByDEseq2AndEdgeR(input_type)
+    imfo = try{
+      runByDEseq2AndEdgeRmain(input_type)
+    }
 
     setwd("../")
 
