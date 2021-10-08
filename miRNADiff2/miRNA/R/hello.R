@@ -951,7 +951,7 @@ autoAnalyssisSingleCancer <-function(input_type = NULL){
 
   envirment()
 
-  if(!is.null(input_type)){
+  if(is.null(input_type)){
 
     print("支持的癌症种类的缩写如下，请选择下载的癌症类型")
 
@@ -1007,6 +1007,8 @@ autoAnalyssisSingleCancer <-function(input_type = NULL){
 
   print("行名分割替换")
 
+  expr=exp
+
   rowName <- str_split(rownames(exp),'_',simplify = T)[,3]
 
   expr<- apply(expr,2,as.numeric)
@@ -1039,17 +1041,17 @@ autoAnalyssisSingleCancer <-function(input_type = NULL){
 
   colnames(meta)
 
-  meta <- meta[,c("submitter_id","vital_status",
+  #meta <- meta[,c("submitter_id","vital_status",
 
-                  "days_to_death","days_to_last_follow_up",
-
-                  "race",
-
-                  "age_at_diagnosis",
-
-                  "gender" ,
-
-                  "ajcc_pathologic_stage")]
+  #                "days_to_death","days_to_last_follow_up",
+#
+ #                 "race",
+#
+ #                 "age_at_diagnosis",
+#
+ #                 "gender" ,
+#
+ #                 "ajcc_pathologic_stage")]
 
   print("转置样本:")
 
@@ -1922,8 +1924,6 @@ combin_TCGA <-function(cancer_type){
 
 aotoAllCancerAnalysis <- function(){
 
-  setwd("/home/TCGA_Analysis")
-
   cancer_list = TCGAbiolinks:::getGDCprojects()$project_id
 
   table = gregexpr("TCGA",cancer_list)
@@ -1944,7 +1944,7 @@ aotoAllCancerAnalysis <- function(){
 
   cancer_infomation = data.frame(row.names = c("项目名称","样本总数","样本非0基因总数","normal","tumor","DESeq2_DOWN","DESeq2_NOT","DESeq2_UP","edgeR_DOWN","edgeR_NOT","edgeR_UP"))
 
-  for(i in 3:length(needAnalyze)){
+  for(i in 1:length(needAnalyze)){
 
     load("./cancer_infomation.Rdata")
 
@@ -1995,24 +1995,23 @@ aotoAllCancerAnalysis <- function(){
 
 #' @param use edgeR to analyze cancer's miRNA data
 
-aotoAllCancerAnalysisTest <- function(){
+aotoAllCancerAnalysisList <- function(list){
+
   # setwd("/home/TCGA_Analysis")
 
   cancer_infomation = data.frame(row.names = c("项目名称","样本总数","样本非0基因总数","normal","tumor","DESeq2_DOWN","DESeq2_NOT","DESeq2_UP","edgeR_DOWN","edgeR_NOT","edgeR_UP"))
 
-  cancer = c("TCGA-KICH","TCGA-KICH")
+  for(i in 1:length(list)){
 
-  for(i in 1:length(cancer)){
-
-    cancer = c("TCGA-KICH","TCGA-KICH")
-
-    input_type =  cancer[i]
+    input_type =  list[i]
 
     dir.create(input_type)
 
     setwd(paste0("./",input_type))
 
-    imfo = runByDEseq2AndEdgeR(input_type)
+    try({
+      imfo = runByDEseq2AndEdgeR(input_type)
+    })
 
     setwd("../")
 
